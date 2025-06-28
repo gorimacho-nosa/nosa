@@ -1,0 +1,1268 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #87CEEB;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    overflow: hidden;
+}
+
+.game-container {
+    width: 100%;
+    max-width: 800px;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+}
+
+.game-header {
+    background-color: #2c3e50;
+    color: white;
+    padding: 20px;
+    text-align: center;
+}
+
+.game-header h1 {
+    font-size: 2rem;
+    margin-bottom: 10px;
+}
+
+.game-info {
+    display: flex;
+    justify-content: space-around;
+    font-size: 1.1rem;
+}
+
+.game-screen {
+    position: relative;
+    height: 400px;
+    background: linear-gradient(to bottom, #87CEEB 0%, #98D8E8 100%);
+    overflow: hidden;
+}
+
+.start-screen, .game-over-screen {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    background-color: rgba(255, 255, 255, 0.95);
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+    z-index: 100;
+}
+
+.start-screen h2, .game-over-screen h2 {
+    color: #2c3e50;
+    margin-bottom: 15px;
+}
+
+.controls {
+    margin: 20px 0;
+    padding: 15px;
+    background-color: #f0f0f0;
+    border-radius: 5px;
+}
+
+.controls h3 {
+    color: #2c3e50;
+    margin-bottom: 10px;
+}
+
+.controls p {
+    margin: 5px 0;
+    color: #555;
+}
+
+.start-button, .restart-button {
+    margin-top: 20px;
+    padding: 15px 40px;
+    font-size: 1.2rem;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 4px 0 #2980b9;
+}
+
+.start-button:hover, .restart-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 0 #2980b9;
+}
+
+.start-button:active, .restart-button:active {
+    transform: translateY(2px);
+    box-shadow: 0 2px 0 #2980b9;
+}
+
+.game-area {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.background {
+    position: absolute;
+    width: 200%;
+    height: 100%;
+    background: repeating-linear-gradient(
+        90deg,
+        transparent,
+        transparent 100px,
+        rgba(255, 255, 255, 0.1) 100px,
+        rgba(255, 255, 255, 0.1) 200px
+    );
+    animation: backgroundMove 10s linear infinite;
+}
+
+@keyframes backgroundMove {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+}
+
+.background::after {
+    content: '';
+    position: absolute;
+    width: 200%;
+    height: 100%;
+    background: repeating-linear-gradient(
+        90deg,
+        transparent,
+        transparent 50px,
+        rgba(255, 255, 255, 0.2) 50px,
+        rgba(255, 255, 255, 0.2) 52px
+    );
+    animation: backgroundMove 0.5s linear infinite;
+}
+
+.player::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: -20px;
+    width: 150px;
+    height: 8px;
+    background: linear-gradient(to left, 
+        rgba(255,100,0,0.8) 0%, 
+        rgba(255,200,0,0.6) 30%, 
+        rgba(0,255,255,0.4) 60%, 
+        transparent 100%);
+    animation: speedLines 0.08s linear infinite;
+    filter: blur(3px);
+    box-shadow: 0 0 15px rgba(255,100,0,0.5);
+}
+
+.player::before {
+    content: '';
+    position: absolute;
+    bottom: 20px;
+    left: -40px;
+    width: 120px;
+    height: 5px;
+    background: linear-gradient(to left, 
+        rgba(255,255,0,0.6) 0%, 
+        rgba(255,0,255,0.4) 50%, 
+        transparent 100%);
+    animation: speedLines2 0.12s linear infinite;
+    filter: blur(2px);
+    box-shadow: 0 0 10px rgba(255,255,0,0.4);
+}
+
+/* 追加のトレイル効果 */
+.takuo-sensei::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: -30px;
+    width: 80px;
+    height: 3px;
+    background: linear-gradient(to left, 
+        rgba(0,255,255,0.5) 0%, 
+        rgba(255,0,255,0.3) 50%, 
+        transparent 100%);
+    animation: character-trail 0.1s linear infinite;
+    filter: blur(1px);
+    z-index: -1;
+}
+
+@keyframes character-trail {
+    0% { transform: translateX(0) scaleX(1); opacity: 0.5; }
+    100% { transform: translateX(-60px) scaleX(0.2); opacity: 0; }
+}
+
+@keyframes speedLines {
+    0% { transform: translateX(0) scaleX(1); }
+    100% { transform: translateX(-50px) scaleX(0.3); }
+}
+
+@keyframes speedLines2 {
+    0% { transform: translateX(0) scaleX(1); opacity: 1; }
+    100% { transform: translateX(-40px) scaleX(0.5); opacity: 0; }
+}
+
+.ground {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 60px;
+    background: linear-gradient(to bottom, #8B7355 0%, #654321 100%);
+    border-top: 3px solid #4A4A4A;
+    box-shadow: 
+        0 0 20px rgba(139, 115, 85, 0.5),
+        inset 0 -10px 20px rgba(0, 0, 0, 0.3);
+    animation: ground-pulse 2s ease-in-out infinite;
+}
+
+@keyframes ground-pulse {
+    0%, 100% { 
+        box-shadow: 
+            0 0 20px rgba(139, 115, 85, 0.5),
+            inset 0 -10px 20px rgba(0, 0, 0, 0.3);
+    }
+    50% { 
+        box-shadow: 
+            0 0 30px rgba(255, 215, 0, 0.3),
+            inset 0 -10px 20px rgba(255, 215, 0, 0.1);
+    }
+}
+
+.ground::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 200%;
+    height: 100%;
+    background: repeating-linear-gradient(
+        90deg,
+        transparent,
+        transparent 20px,
+        rgba(0, 0, 0, 0.1) 20px,
+        rgba(0, 0, 0, 0.1) 21px
+    );
+    animation: groundMove 0.3s linear infinite;
+}
+
+@keyframes groundMove {
+    from { transform: translateX(0); }
+    to { transform: translateX(-21px); }
+}
+
+.player {
+    position: absolute;
+    bottom: 60px;
+    left: 100px;
+    width: 70px;
+    height: 90px;
+    transition: bottom 0.3s;
+}
+
+.player-body {
+    width: 100%;
+    height: 100%;
+    transform-origin: center bottom;
+}
+
+.takuo-sensei {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    animation: running 0.5s ease-in-out infinite;
+}
+
+@keyframes running {
+    0% { transform: translateY(0) rotate(-8deg) scale(1, 1); }
+    25% { transform: translateY(-5px) rotate(0deg) scale(1.05, 0.95); }
+    50% { transform: translateY(0) rotate(8deg) scale(1, 1); }
+    75% { transform: translateY(-5px) rotate(0deg) scale(0.95, 1.05); }
+    100% { transform: translateY(0) rotate(-8deg) scale(1, 1); }
+}
+
+.takuo-head {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 45px;
+    height: 45px;
+    background-color: #FDBCB4;
+    border-radius: 50% 50% 45% 45%;
+    z-index: 2;
+}
+
+.takuo-head::after {
+    content: '';
+    position: absolute;
+    top: 10px;
+    right: -5px;
+    width: 15px;
+    height: 8px;
+    background: linear-gradient(to right, rgba(0,0,0,0.1) 0%, transparent 100%);
+    border-radius: 50%;
+    animation: sweat 1s ease-in-out infinite;
+}
+
+@keyframes sweat {
+    0% { transform: translateY(0) scale(1); opacity: 0; }
+    20% { opacity: 1; }
+    100% { transform: translateY(20px) scale(0.5); opacity: 0; }
+}
+
+.takuo-glasses {
+    position: absolute;
+    top: 15px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 40px;
+    height: 15px;
+    z-index: 3;
+}
+
+.takuo-glasses::before,
+.takuo-glasses::after {
+    content: '';
+    position: absolute;
+    width: 15px;
+    height: 15px;
+    border: 3px solid #333;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.3);
+}
+
+.takuo-glasses::before {
+    left: 0;
+}
+
+.takuo-glasses::after {
+    right: 0;
+}
+
+.takuo-face::before,
+.takuo-face::after {
+    content: '';
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background-color: #333;
+    border-radius: 50%;
+    top: 20px;
+}
+
+.takuo-face::before {
+    left: 12px;
+}
+
+.takuo-face::after {
+    right: 12px;
+}
+
+.takuo-body {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 65px;
+    height: 50px;
+    background-color: #4682B4;
+    border-radius: 40% 40% 20% 20%;
+    z-index: 1;
+}
+
+.takuo-body::after {
+    content: '';
+    position: absolute;
+    top: 15px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 10px;
+    height: 20px;
+    background-color: #FF6347;
+    animation: tieBlow 0.3s ease-in-out infinite;
+}
+
+@keyframes tieBlow {
+    0% { transform: translateX(-50%) rotate(0deg) scaleX(1); }
+    50% { transform: translateX(-30%) rotate(-45deg) scaleX(1.5); }
+    100% { transform: translateX(-50%) rotate(0deg) scaleX(1); }
+}
+
+.takuo-body::before {
+    content: '';
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 30px;
+    height: 35px;
+    background-color: white;
+    border-radius: 5px;
+}
+
+
+.player.jumping {
+    animation: jump 0.6s ease-out;
+}
+
+.player.sliding {
+    height: 50px;
+}
+
+.player.sliding .takuo-sensei {
+    transform: rotateZ(-30deg) scale(0.8);
+    animation: none;
+}
+
+.player.sliding .takuo-body {
+    width: 80px;
+}
+
+@keyframes jump {
+    0%, 100% { bottom: 60px; }
+    50% { bottom: 180px; }
+}
+
+.obstacle {
+    position: absolute;
+    bottom: 60px; /* プレイヤーと同じ高さに配置 */
+}
+
+
+.obstacle-student {
+    width: 50px;
+    height: 70px;
+    position: absolute;
+}
+
+.obstacle-student::before {
+    content: '';
+    position: absolute;
+    bottom: 40px; /* 体の上に頭を配置 */
+    left: 50%;
+    transform: translateX(-50%);
+    width: 30px;
+    height: 30px;
+    background-color: #FDBCB4;
+    border-radius: 50%;
+    z-index: 2;
+}
+
+.obstacle-student::after {
+    content: '';
+    position: absolute;
+    bottom: 0; /* 底辺を基準に */
+    left: 50%;
+    transform: translateX(-50%);
+    width: 40px;
+    height: 45px;
+    background-color: #2C3E50;
+    border-radius: 20% 20% 10% 10%;
+    z-index: 1;
+}
+
+/* 生徒の髪 */
+.obstacle-student .student-hair {
+    position: absolute;
+    bottom: 65px; /* 頭の上に配置 */
+    left: 50%;
+    transform: translateX(-50%);
+    width: 35px;
+    height: 20px;
+    background-color: #333;
+    border-radius: 50% 50% 30% 30%;
+    z-index: 3;
+}
+
+/* 生徒の腕（手を挙げている） */
+.obstacle-student .student-arm {
+    position: absolute;
+    bottom: 30px; /* 体の中央に配置 */
+    right: -10px;
+    width: 15px;
+    height: 3px;
+    background-color: #FDBCB4;
+    transform: rotate(-45deg);
+    transform-origin: left center;
+    z-index: 2;
+    animation: waving 0.5s ease-in-out infinite;
+}
+
+@keyframes waving {
+    0%, 100% { transform: rotate(-45deg); }
+    50% { transform: rotate(-60deg); }
+}
+
+.obstacle-desk {
+    width: 80px;
+    height: 50px;
+    background-color: #8B4513;
+    border: 2px solid #654321;
+    position: relative;
+    border-radius: 5px;
+    box-shadow: 0 3px 5px rgba(0,0,0,0.3);
+}
+
+.obstacle-desk::before {
+    content: '';
+    position: absolute;
+    top: -15px;
+    left: 10px;
+    width: 20px;
+    height: 15px;
+    background-color: #FFF;
+    border: 1px solid #DDD;
+    transform: rotate(-5deg);
+}
+
+.obstacle-desk::after {
+    content: '';
+    position: absolute;
+    top: -10px;
+    right: 10px;
+    width: 15px;
+    height: 10px;
+    background-color: #FFD700;
+    border-radius: 2px;
+    transform: rotate(10deg);
+}
+
+.obstacle-cone {
+    width: 50px;
+    height: 60px;
+    position: relative;
+}
+
+.obstacle-cone::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 25px solid transparent;
+    border-right: 25px solid transparent;
+    border-bottom: 60px solid #FF6600;
+}
+
+.obstacle-cone::after {
+    content: '';
+    position: absolute;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 30px;
+    height: 4px;
+    background-color: #FFF;
+    border-radius: 2px;
+}
+
+/* コーンの反射板 */
+.obstacle-cone .cone-stripe {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 35px;
+    height: 4px;
+    background-color: #FFF;
+    border-radius: 2px;
+}
+
+.item {
+    position: absolute;
+    font-size: 30px;
+    animation: bounce 1s ease-in-out infinite;
+}
+
+@keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
+}
+
+.item-coffee {
+    bottom: 80px;
+}
+
+.item-paper {
+    bottom: 80px;
+}
+
+.item-energy {
+    bottom: 80px;
+}
+
+.item-coin {
+    bottom: 80px;
+}
+
+.item-clock {
+    bottom: 80px;
+}
+
+/* 校長先生 */
+.obstacle-principal {
+    width: 60px;
+    height: 80px;
+    position: absolute;
+}
+
+.obstacle-principal::before {
+    content: '';
+    position: absolute;
+    bottom: 45px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 35px;
+    height: 35px;
+    background-color: #FFB6C1;
+    border-radius: 50%;
+    z-index: 2;
+}
+
+.obstacle-principal::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 50px;
+    height: 50px;
+    background-color: #4B0082;
+    border-radius: 25% 25% 15% 15%;
+    z-index: 1;
+}
+
+.principal-glasses {
+    position: absolute;
+    bottom: 55px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 30px;
+    height: 10px;
+    z-index: 3;
+}
+
+.principal-glasses::before,
+.principal-glasses::after {
+    content: '';
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    border: 2px solid #000;
+    background-color: rgba(255, 255, 255, 0.5);
+    border-radius: 0;
+}
+
+.principal-glasses::before {
+    left: 0;
+}
+
+.principal-glasses::after {
+    right: 0;
+}
+
+.principal-tie {
+    position: absolute;
+    bottom: 25px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 8px;
+    height: 20px;
+    background-color: #DC143C;
+    z-index: 2;
+}
+
+/* ほうき */
+.obstacle-broom {
+    width: 60px;
+    height: 70px;
+    position: absolute;
+}
+
+.obstacle-broom::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 40px;
+    height: 30px;
+    background-color: #8B4513;
+    border-radius: 40% 40% 20% 20%;
+    z-index: 1;
+}
+
+.broom-handle {
+    position: absolute;
+    bottom: 25px;
+    left: 50%;
+    transform: translateX(-50%) rotate(10deg);
+    width: 6px;
+    height: 50px;
+    background-color: #654321;
+    z-index: 2;
+}
+
+/* 水たまり */
+.obstacle-puddle {
+    width: 80px;
+    height: 20px;
+    position: absolute;
+}
+
+.obstacle-puddle::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 15px;
+    background: radial-gradient(ellipse at center, #4682B4 0%, #5F9EA0 70%, transparent 100%);
+    border-radius: 50%;
+    opacity: 0.8;
+    animation: puddle-ripple 2s ease-in-out infinite;
+}
+
+@keyframes puddle-ripple {
+    0%, 100% { transform: translateX(-50%) scale(1); }
+    50% { transform: translateX(-50%) scale(1.1); }
+}
+
+.game-over-message {
+    font-size: 1.2rem;
+    color: #e74c3c;
+    margin: 10px 0;
+}
+
+.game-footer {
+    background-color: #ecf0f1;
+    padding: 15px;
+    text-align: center;
+    color: #7f8c8d;
+}
+
+@media (max-width: 600px) {
+    .game-container {
+        margin: 20px;
+    }
+    
+    .game-header h1 {
+        font-size: 1.5rem;
+    }
+    
+    .game-info {
+        font-size: 1rem;
+    }
+    
+    .game-screen {
+        height: 300px;
+    }
+    
+    .player {
+        left: 50px;
+    }
+}
+
+@keyframes boostEffect {
+    0% {
+        transform: translate(-50%, -50%) scale(0.5);
+        opacity: 0;
+    }
+    50% {
+        transform: translate(-50%, -50%) scale(1.2);
+        opacity: 1;
+    }
+    100% {
+        transform: translate(-50%, -50%) scale(1.5);
+        opacity: 0;
+    }
+}
+
+.game-area::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.3) 50%, transparent 100%);
+    animation: speedEffect 0.8s linear infinite;
+    pointer-events: none;
+    opacity: 0.7;
+}
+
+@keyframes speedEffect {
+    0% { transform: translateX(-100%) skewX(-20deg); }
+    100% { transform: translateX(100%) skewX(-20deg); }
+}
+
+.game-screen {
+    position: relative;
+    height: 400px;
+    background: linear-gradient(to bottom, #87CEEB 0%, #98D8E8 100%);
+    overflow: hidden;
+}
+
+@keyframes superSpeedLine {
+    from { transform: translateX(0); }
+    to { transform: translateX(-120%); }
+}
+
+.game-area.super-speed {
+    /* 横揺れを削除し、代わりにズーム効果を追加 */
+    animation: speedZoom 2s ease-in-out;
+}
+
+@keyframes speedZoom {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+.game-area.super-speed::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(ellipse at center, transparent 0%, rgba(255,255,100,0.2) 100%);
+    animation: pulse 0.5s ease-in-out infinite;
+    pointer-events: none;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 0.8; }
+}
+
+@keyframes hitFlash {
+    0% { opacity: 0; }
+    50% { opacity: 1; }
+    100% { opacity: 0; }
+}
+
+/* プログレスバー */
+.progress-bar {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    right: 10px;
+    height: 20px;
+    background-color: rgba(0, 0, 0, 0.3);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #27ae60 0%, #2ecc71 100%);
+    width: 0%;
+    transition: width 0.3s ease;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(46, 204, 113, 0.5);
+}
+
+.progress-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-weight: bold;
+    font-size: 12px;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+/* ゴール */
+.goal {
+    position: absolute;
+    right: -200px;
+    bottom: 60px;
+    width: 150px;
+    height: 150px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: right 0.1s linear;
+}
+
+/* パーティクル効果 */
+.goal::before {
+    content: '🎉 🎊 ✨ 🌟 💫 ⭐ 🎆 🎇';
+    position: absolute;
+    top: -30px;
+    left: -50px;
+    right: -50px;
+    bottom: -30px;
+    font-size: 20px;
+    line-height: 1.5;
+    animation: particle-dance 4s ease-in-out infinite;
+    z-index: 0;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+}
+
+.goal::after {
+    content: '';
+    position: absolute;
+    top: -20px;
+    left: -20px;
+    right: -20px;
+    bottom: -20px;
+    background: radial-gradient(
+        circle at 50% 50%,
+        rgba(255, 215, 0, 0.3) 0%,
+        rgba(255, 105, 180, 0.2) 30%,
+        rgba(0, 191, 255, 0.2) 60%,
+        transparent 100%
+    );
+    border-radius: 50%;
+    animation: aura-pulse 2s ease-in-out infinite;
+    z-index: -1;
+}
+
+@keyframes particle-dance {
+    0% { 
+        transform: rotate(0deg) scale(0.8);
+        opacity: 0.7;
+    }
+    25% { 
+        transform: rotate(90deg) scale(1.2);
+        opacity: 1;
+    }
+    50% { 
+        transform: rotate(180deg) scale(0.9);
+        opacity: 0.8;
+    }
+    75% { 
+        transform: rotate(270deg) scale(1.1);
+        opacity: 1;
+    }
+    100% { 
+        transform: rotate(360deg) scale(0.8);
+        opacity: 0.7;
+    }
+}
+
+@keyframes aura-pulse {
+    0%, 100% { 
+        transform: scale(1);
+        opacity: 0.3;
+    }
+    50% { 
+        transform: scale(1.3);
+        opacity: 0.7;
+    }
+}
+
+.goal-flag {
+    font-size: 60px;
+    animation: wave-flag 1s ease-in-out infinite;
+    z-index: 3;
+}
+
+.goal-text {
+    font-size: 24px;
+    font-weight: bold;
+    color: #FFD700;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    margin: 10px 0;
+    z-index: 2;
+}
+
+.goal-house {
+    font-size: 120px;
+    z-index: 1;
+    filter: drop-shadow(0 5px 10px rgba(0, 0, 0, 0.3));
+    animation: house-rainbow 3s ease-in-out infinite;
+    position: relative;
+}
+
+.goal-house::before {
+    content: '✨';
+    position: absolute;
+    top: -20px;
+    left: -20px;
+    font-size: 30px;
+    animation: sparkle-1 1.5s ease-in-out infinite;
+}
+
+.goal-house::after {
+    content: '🌟';
+    position: absolute;
+    top: -10px;
+    right: -20px;
+    font-size: 25px;
+    animation: sparkle-2 2s ease-in-out infinite;
+}
+
+@keyframes house-rainbow {
+    0% { 
+        transform: scale(1) rotate(0deg);
+        filter: 
+            drop-shadow(0 5px 10px rgba(0, 0, 0, 0.3))
+            hue-rotate(0deg)
+            brightness(1.2);
+    }
+    25% { 
+        transform: scale(1.1) rotate(-2deg);
+        filter: 
+            drop-shadow(0 0 30px rgba(255, 0, 255, 0.8))
+            hue-rotate(90deg)
+            brightness(1.5);
+    }
+    50% { 
+        transform: scale(1.15) rotate(0deg);
+        filter: 
+            drop-shadow(0 0 40px rgba(0, 255, 255, 0.9))
+            hue-rotate(180deg)
+            brightness(1.8);
+    }
+    75% { 
+        transform: scale(1.1) rotate(2deg);
+        filter: 
+            drop-shadow(0 0 30px rgba(255, 255, 0, 0.8))
+            hue-rotate(270deg)
+            brightness(1.5);
+    }
+    100% { 
+        transform: scale(1) rotate(0deg);
+        filter: 
+            drop-shadow(0 5px 10px rgba(0, 0, 0, 0.3))
+            hue-rotate(360deg)
+            brightness(1.2);
+    }
+}
+
+@keyframes sparkle-1 {
+    0%, 100% { 
+        transform: scale(0.5) rotate(0deg);
+        opacity: 0.3;
+    }
+    50% { 
+        transform: scale(1.5) rotate(180deg);
+        opacity: 1;
+    }
+}
+
+@keyframes sparkle-2 {
+    0%, 100% { 
+        transform: scale(0.8) rotate(0deg);
+        opacity: 0.5;
+    }
+    50% { 
+        transform: scale(1.2) rotate(-180deg);
+        opacity: 1;
+    }
+}
+
+@keyframes wave-flag {
+    0%, 100% { transform: rotate(-5deg); }
+    50% { transform: rotate(5deg); }
+}
+
+/* 勝利エフェクトのアニメーション */
+@keyframes victoryFlash {
+    0% { opacity: 0; }
+    20% { opacity: 0.8; }
+    40% { opacity: 0.3; }
+    60% { opacity: 0.9; }
+    80% { opacity: 0.4; }
+    100% { opacity: 0; }
+}
+
+@keyframes victoryText {
+    0% { 
+        transform: translate(-50%, -50%) scale(0.3) rotate(-10deg);
+        opacity: 0;
+    }
+    30% { 
+        transform: translate(-50%, -50%) scale(1.3) rotate(5deg);
+        opacity: 1;
+    }
+    70% { 
+        transform: translate(-50%, -50%) scale(1.1) rotate(-2deg);
+        opacity: 1;
+    }
+    100% { 
+        transform: translate(-50%, -50%) scale(1) rotate(0deg);
+        opacity: 1;
+    }
+}
+
+@keyframes firework {
+    0% { 
+        transform: scale(0) rotate(0deg);
+        opacity: 1;
+    }
+    50% { 
+        transform: scale(3) rotate(180deg);
+        opacity: 0.8;
+    }
+    100% { 
+        transform: scale(0) rotate(360deg);
+        opacity: 0;
+    }
+}
+
+@keyframes confetti-fall {
+    0% { 
+        transform: translateY(0) rotate(0deg);
+        opacity: 1;
+    }
+    100% { 
+        transform: translateY(450px) rotate(720deg);
+        opacity: 0;
+    }
+}
+
+/* ゴール接近時のエフェクト */
+.game-area.goal-approaching {
+    border: 5px solid transparent;
+    animation: goal-approaching-border 1s ease-in-out infinite;
+}
+
+@keyframes goal-approaching-border {
+    0% { 
+        border-color: rgba(255, 215, 0, 0.8);
+        box-shadow: 
+            inset 0 0 20px rgba(255, 215, 0, 0.3),
+            0 0 30px rgba(255, 215, 0, 0.5);
+    }
+    50% { 
+        border-color: rgba(255, 105, 180, 0.8);
+        box-shadow: 
+            inset 0 0 30px rgba(255, 105, 180, 0.4),
+            0 0 40px rgba(255, 105, 180, 0.6);
+    }
+    100% { 
+        border-color: rgba(0, 191, 255, 0.8);
+        box-shadow: 
+            inset 0 0 20px rgba(0, 191, 255, 0.3),
+            0 0 30px rgba(0, 191, 255, 0.5);
+    }
+}
+
+@keyframes approaching-sparkle {
+    0% { 
+        transform: scale(0) rotate(0deg);
+        opacity: 1;
+    }
+    50% { 
+        transform: scale(1.5) rotate(180deg);
+        opacity: 0.8;
+    }
+    100% { 
+        transform: scale(0.3) rotate(360deg);
+        opacity: 0;
+    }
+}
+
+/* 新しいゲームプレイエフェクト */
+@keyframes background-particle-move {
+    0% { 
+        transform: translateX(0) scale(0.5);
+        opacity: 0.3;
+    }
+    50% { 
+        transform: translateX(-400px) scale(1);
+        opacity: 0.8;
+    }
+    100% { 
+        transform: translateX(-800px) scale(0.3);
+        opacity: 0;
+    }
+}
+
+@keyframes sky-element-move {
+    0% { 
+        transform: translateX(0) scale(1);
+        opacity: 0.7;
+    }
+    100% { 
+        transform: translateX(-900px) scale(0.8);
+        opacity: 0;
+    }
+}
+
+@keyframes speed-line-move {
+    0% { 
+        transform: translateX(0);
+        opacity: 0.8;
+    }
+    100% { 
+        transform: translateX(-800px);
+        opacity: 0;
+    }
+}
+
+@keyframes floating-score {
+    0% { 
+        transform: translateY(0) scale(1);
+        opacity: 1;
+    }
+    100% { 
+        transform: translateY(-80px) scale(1.2);
+        opacity: 0;
+    }
+}
+
+@keyframes combo-effect {
+    0% { 
+        transform: translate(-50%, -50%) scale(0.5) rotate(-10deg);
+        opacity: 0;
+    }
+    50% { 
+        transform: translate(-50%, -50%) scale(1.3) rotate(5deg);
+        opacity: 1;
+    }
+    100% { 
+        transform: translate(-50%, -50%) scale(1) rotate(0deg);
+        opacity: 0;
+    }
+}
+
+@keyframes combo-screen-flash {
+    0% { 
+        opacity: 0;
+        transform: scale(0.8);
+    }
+    50% { 
+        opacity: 1;
+        transform: scale(1.1);
+    }
+    100% { 
+        opacity: 0;
+        transform: scale(1);
+    }
+}
+
+/* 高速時のエフェクト */
+.game-area.hyper-speed {
+    filter: brightness(1.2) contrast(1.1);
+}
+
+.game-area.hyper-speed::before {
+    animation-duration: 0.3s;
+}
+
+.game-area.ultra-speed {
+    filter: brightness(1.4) contrast(1.2) hue-rotate(20deg);
+}
+
+.game-area.ultra-speed::before {
+    animation-duration: 0.15s;
+}
+}

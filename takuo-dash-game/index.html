@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>たくお先生の帰宅ダッシュ</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="game-container">
+        <div class="game-header">
+            <h1>たくお先生の帰宅ダッシュ</h1>
+            <div class="game-info">
+                <div class="score">スコア: <span id="score">0</span></div>
+                <div class="distance">距離: <span id="distance">0</span>m / <span id="goal-distance">2000</span>m</div>
+                <div class="time">タイム: <span id="time">0.0</span>秒</div>
+                <div class="best-time">ベストタイム: <span id="best-time">-</span></div>
+            </div>
+        </div>
+
+        <div class="game-screen" id="game-screen">
+            <div class="start-screen" id="start-screen">
+                <h2>たくお先生の帰宅ダッシュ</h2>
+                <p>授業が終わりました！<br>障害物を避けながら、できるだけ早く家に帰りましょう！</p>
+                <div class="controls">
+                    <h3>操作方法</h3>
+                    <p>↑ or W: ジャンプ</p>
+                    <p>↓ or S: スライディング</p>
+                    <p>スペース: スタート/リスタート</p>
+                </div>
+                <button class="start-button" id="start-button">ゲームスタート</button>
+            </div>
+
+            <div class="game-area" id="game-area" style="display: none;">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress-fill"></div>
+                    <div class="progress-text" id="progress-text">0%</div>
+                </div>
+                <div class="background" id="background"></div>
+                <div class="ground"></div>
+                <div class="player" id="player">
+                    <div class="player-body">
+                        <div class="takuo-sensei">
+                            <div class="takuo-head">
+                                <div class="takuo-glasses"></div>
+                                <div class="takuo-face"></div>
+                            </div>
+                            <div class="takuo-body"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="obstacles" id="obstacles"></div>
+                <div class="items" id="items"></div>
+                <div class="goal" id="goal" style="display: none;">
+                    <div class="goal-flag">🏁</div>
+                    <div class="goal-house">🏠</div>
+                    <div class="goal-text">たくお先生の家</div>
+                </div>
+            </div>
+
+            <div class="game-over-screen" id="game-over-screen" style="display: none;">
+                <h2>ゲームオーバー</h2>
+                <p class="game-over-message" id="game-over-message"></p>
+                <p>タイム: <span id="final-time">0.0</span>秒</p>
+                <p>スコア: <span id="final-score">0</span></p>
+                <button class="restart-button" id="restart-button">もう一度プレイ</button>
+            </div>
+        </div>
+
+        <div class="game-footer">
+            <p>数学教師たくお先生が、授業後に素早く家に帰るゲーム！</p>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
