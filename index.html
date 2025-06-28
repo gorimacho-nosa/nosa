@@ -5,56 +5,146 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>プロジェクト一覧</title>
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
         body {
-            font-family: Arial, sans-serif;
-            max-width: 800px;
-            margin: 0 auto;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             padding: 20px;
-            background-color: #f5f5f5;
         }
+        
         .container {
-            background: white;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            max-width: 1000px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
         }
+        
         h1 {
-            color: #333;
+            font-size: 2.5rem;
+            font-weight: 300;
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 50px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
+        
         .project-list {
             display: grid;
-            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
         }
+        
         .project-card {
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            padding: 20px;
-            background: #fafafa;
-            transition: transform 0.2s;
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
         }
+        
+        .project-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+        }
+        
         .project-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
         }
+        
         .project-title {
-            font-size: 1.2em;
-            font-weight: bold;
-            margin-bottom: 10px;
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 20px;
             color: #2c3e50;
         }
-        .project-link {
-            display: inline-block;
-            background: #3498db;
-            color: white;
-            padding: 8px 16px;
-            text-decoration: none;
-            border-radius: 5px;
-            transition: background 0.2s;
+        
+        .project-description {
+            color: #64748b;
+            margin-bottom: 25px;
+            line-height: 1.6;
         }
+        
+        .project-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 12px 24px;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .project-link::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+        
+        .project-link:hover::before {
+            left: 100%;
+        }
+        
         .project-link:hover {
-            background: #2980b9;
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .project-link::after {
+            content: '→';
+            transition: transform 0.3s ease;
+        }
+        
+        .project-link:hover::after {
+            transform: translateX(4px);
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 25px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+                margin-bottom: 30px;
+            }
+            
+            .project-list {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .project-card {
+                padding: 25px;
+            }
         }
     </style>
 </head>
@@ -64,11 +154,13 @@
         <div class="project-list">
             <div class="project-card">
                 <div class="project-title">Nosa Project</div>
-                <a href="nosa/index.html" class="project-link">開く</a>
+                <div class="project-description">美しいインタラクティブなプロジェクト体験をお楽しみください。</div>
+                <a href="nosa/index.html" class="project-link">プロジェクトを開く</a>
             </div>
             <div class="project-card">
                 <div class="project-title">Takuo Dash Game</div>
-                <a href="takuo-dash-game/index.html" class="project-link">開く</a>
+                <div class="project-description">エキサイティングなダッシュゲームで楽しい時間を過ごしましょう。</div>
+                <a href="takuo-dash-game/index.html" class="project-link">ゲームをプレイ</a>
             </div>
         </div>
     </div>
