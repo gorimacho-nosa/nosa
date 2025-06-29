@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>async/await - さらに直感的な非同期処理</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="async-styles.css">
+</head>
+<body>
+    <header>
+        <div style="text-align: right; padding: 10px;">
+            <a href="promise.html" style="color: white; text-decoration: none; font-size: 16px; background: rgba(255,255,255,0.2); padding: 8px 16px; border-radius: 8px; transition: background 0.3s;">← Promiseガイド</a>
+        </div>
+        <h1>async/await<br>完全理解ガイド</h1>
+        <p class="subtitle">同期的に書ける非同期処理 - Promiseをさらに使いやすく</p>
+    </header>
+
+    <nav>
+        <ul>
+            <li><a href="#what-is-async-await">async/awaitとは？</a></li>
+            <li><a href="#basic-syntax">基本的な構文</a></li>
+            <li><a href="#error-handling">エラー処理</a></li>
+            <li><a href="#parallel-processing">並列処理</a></li>
+            <li><a href="#practical-examples">実践的な例</a></li>
+            <li><a href="#best-practices">ベストプラクティス</a></li>
+        </ul>
+    </nav>
+
+    <main>
+        <section id="what-is-async-await">
+            <h2>async/awaitとは？</h2>
+            <div class="explanation">
+                <p>async/awaitは<strong>Promiseをより直感的に扱うための構文糖衣（シンタックスシュガー）</strong>です。</p>
+                <p>非同期処理を同期処理のように書けるため、コードがより読みやすくなります。</p>
+                
+                <div class="analogy">
+                    <h3>🍳 日常生活での例え</h3>
+                    <p>料理のレシピを書くときの違いのようなものです！</p>
+                    <div class="recipe-comparison">
+                        <div class="promise-recipe">
+                            <h4>Promiseスタイル（複雑）</h4>
+                            <ol>
+                                <li>野菜を切る.then(() =></li>
+                                <li>&nbsp;&nbsp;フライパンを温める).then(() =></li>
+                                <li>&nbsp;&nbsp;&nbsp;&nbsp;炒める).then(() =></li>
+                                <li>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;完成！)</li>
+                            </ol>
+                        </div>
+                        <div class="async-recipe">
+                            <h4>async/awaitスタイル（シンプル）</h4>
+                            <ol>
+                                <li>野菜を切る</li>
+                                <li>フライパンを温める</li>
+                                <li>炒める</li>
+                                <li>完成！</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+
+                <h3>Promiseとasync/awaitの比較</h3>
+                <div class="code-comparison">
+                    <div class="promise-code">
+                        <h4>Promiseチェーン</h4>
+                        <pre><code>function fetchUserData() {
+    return fetch('/api/user')
+        .then(response => response.json())
+        .then(user => {
+            return fetch(`/api/posts/${user.id}`);
+        })
+        .then(response => response.json())
+        .then(posts => {
+            console.log(posts);
+        })
+        .catch(error => {
+            console.error(error);
+        });
+}</code></pre>
+                    </div>
+                    <div class="async-code">
+                        <h4>async/await</h4>
+                        <pre><code>async function fetchUserData() {
+    try {
+        const userResponse = await fetch('/api/user');
+        const user = await userResponse.json();
+        
+        const postsResponse = await fetch(`/api/posts/${user.id}`);
+        const posts = await postsResponse.json();
+        
+        console.log(posts);
+    } catch (error) {
+        console.error(error);
+    }
+}</code></pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="basic-syntax">
+            <h2>基本的な構文</h2>
+            
+            <div class="syntax-rules">
+                <div class="rule">
+                    <h3>1. async関数の定義</h3>
+                    <p>関数の前に<code>async</code>キーワードを付ける</p>
+                    <pre><code>// 関数宣言
+async function myFunction() {
+    // ...
+}
+
+// 関数式
+const myFunction = async () => {
+    // ...
+}
+
+// メソッド
+class MyClass {
+    async myMethod() {
+        // ...
+    }
+}</code></pre>
+                </div>
+
+                <div class="rule">
+                    <h3>2. awaitの使用</h3>
+                    <p>Promiseの前に<code>await</code>キーワードを付ける</p>
+                    <pre><code>async function example() {
+    // awaitはasync関数内でのみ使用可能
+    const result = await somePromise();
+    console.log(result);
+}</code></pre>
+                </div>
+            </div>
+
+            <div class="example">
+                <h3>基本的な例</h3>
+                <pre><code>// 遅延を作る関数
+function delay(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+// async/awaitを使った関数
+async function greetWithDelay() {
+    console.log('こんにちは！');
+    
+    await delay(2000); // 2秒待つ
+    console.log('2秒経ちました');
+    
+    await delay(1000); // 1秒待つ
+    console.log('さらに1秒経ちました');
+    
+    return '挨拶完了！';
+}
+
+// 実行
+greetWithDelay().then(result => {
+    console.log(result);
+});</code></pre>
+                <button class="run-code" onclick="runAsyncExample1()">実行してみる</button>
+                <div class="output" id="async-output-1"></div>
+            </div>
+        </section>
+
+        <section id="error-handling">
+            <h2>エラー処理</h2>
+            
+            <div class="example">
+                <h3>try-catchを使ったエラー処理</h3>
+                <pre><code>async function fetchDataWithErrorHandling() {
+    try {
+        // 成功する処理
+        const data1 = await Promise.resolve('データ1取得成功');
+        console.log(data1);
+        
+        // 失敗する処理
+        const data2 = await Promise.reject(new Error('データ2取得失敗'));
+        console.log(data2); // ここは実行されない
+        
+    } catch (error) {
+        console.error('エラーをキャッチ:', error.message);
+    } finally {
+        console.log('処理終了');
+    }
+}
+
+fetchDataWithErrorHandling();</code></pre>
+                <button class="run-code" onclick="runErrorHandlingExample()">実行してみる</button>
+                <div class="output" id="error-output"></div>
+            </div>
+
+            <div class="example">
+                <h3>複数のエラーハンドリング</h3>
+                <pre><code>async function robustFetch(url) {
+    const maxRetries = 3;
+    
+    for (let i = 0; i < maxRetries; i++) {
+        try {
+            const response = await fetch(url);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return await response.json();
+            
+        } catch (error) {
+            console.log(`試行 ${i + 1} 失敗:`, error.message);
+            
+            if (i === maxRetries - 1) {
+                throw error; // 最後の試行でも失敗したらエラーを投げる
+            }
+            
+            // 次の試行まで少し待つ
+            await new Promise(resolve => setTimeout(resolve, 1000));
+        }
+    }
+}</code></pre>
+            </div>
+        </section>
+
+        <section id="parallel-processing">
+            <h2>並列処理</h2>
+            
+            <div class="example">
+                <h3>逐次実行 vs 並列実行</h3>
+                <pre><code>// APIを模擬する関数
+async function fetchData(name, delay) {
+    await new Promise(resolve => setTimeout(resolve, delay));
+    return `${name}のデータ`;
+}
+
+// ❌ 逐次実行（遅い）
+async function sequentialFetch() {
+    console.time('逐次実行');
+    
+    const data1 = await fetchData('API1', 1000); // 1秒待つ
+    const data2 = await fetchData('API2', 1000); // さらに1秒待つ
+    const data3 = await fetchData('API3', 1000); // さらに1秒待つ
+    
+    console.log([data1, data2, data3]);
+    console.timeEnd('逐次実行'); // 約3秒
+}
+
+// ✅ 並列実行（速い）
+async function parallelFetch() {
+    console.time('並列実行');
+    
+    const [data1, data2, data3] = await Promise.all([
+        fetchData('API1', 1000),
+        fetchData('API2', 1000),
+        fetchData('API3', 1000)
+    ]);
+    
+    console.log([data1, data2, data3]);
+    console.timeEnd('並列実行'); // 約1秒
+}</code></pre>
+                <button class="run-code" onclick="runParallelExample()">逐次実行を試す</button>
+                <button class="run-code" onclick="runParallelExample2()">並列実行を試す</button>
+                <div class="output" id="parallel-output"></div>
+            </div>
+        </section>
+
+        <section id="practical-examples">
+            <h2>実践的な例</h2>
+            
+            <div class="example">
+                <h3>実用例1: APIチェーン</h3>
+                <pre><code>// ユーザー情報と投稿を取得する実践的な例
+async function getUserWithPosts(userId) {
+    try {
+        // ユーザー情報を取得
+        const user = await fetch(`/api/users/${userId}`).then(r => r.json());
+        
+        // ユーザーの投稿を並列で取得
+        const [posts, profile] = await Promise.all([
+            fetch(`/api/users/${userId}/posts`).then(r => r.json()),
+            fetch(`/api/users/${userId}/profile`).then(r => r.json())
+        ]);
+        
+        // データを整形
+        return {
+            ...user,
+            profile,
+            posts,
+            postCount: posts.length
+        };
+        
+    } catch (error) {
+        console.error('データ取得エラー:', error);
+        return null;
+    }
+}</code></pre>
+            </div>
+
+            <div class="example">
+                <h3>実用例2: ファイル処理</h3>
+                <pre><code>// 複数のファイルを処理する例
+async function processFiles(files) {
+    const results = [];
+    
+    for (const file of files) {
+        try {
+            console.log(`処理中: ${file.name}`);
+            
+            // ファイルを読み込む
+            const content = await readFile(file);
+            
+            // 内容を処理
+            const processed = await processContent(content);
+            
+            // 結果を保存
+            await saveResult(file.name, processed);
+            
+            results.push({
+                file: file.name,
+                status: 'success'
+            });
+            
+        } catch (error) {
+            results.push({
+                file: file.name,
+                status: 'error',
+                error: error.message
+            });
+        }
+    }
+    
+    return results;
+}
+
+// ヘルパー関数（模擬）
+async function readFile(file) {
+    await delay(100);
+    return `${file.name}の内容`;
+}
+
+async function processContent(content) {
+    await delay(200);
+    return content.toUpperCase();
+}
+
+async function saveResult(filename, content) {
+    await delay(100);
+    console.log(`保存完了: ${filename}`);
+}</code></pre>
+                <button class="run-code" onclick="runFileProcessingExample()">実行してみる</button>
+                <div class="output" id="file-output"></div>
+            </div>
+
+            <div class="example">
+                <h3>実用例3: アニメーション制御</h3>
+                <div class="animation-demo">
+                    <div id="animated-box" class="box">📦</div>
+                    <button onclick="runAnimationExample()">アニメーション開始</button>
+                </div>
+                <pre><code>// アニメーションを順番に実行
+async function runAnimation() {
+    const box = document.getElementById('animated-box');
+    
+    // 右に移動
+    await animateBox(box, 'right', 200);
+    
+    // 下に移動
+    await animateBox(box, 'down', 100);
+    
+    // 左に移動
+    await animateBox(box, 'left', 200);
+    
+    // 上に移動
+    await animateBox(box, 'up', 100);
+    
+    // 完了メッセージ
+    box.textContent = '✅';
+}
+
+async function animateBox(element, direction, distance) {
+    return new Promise(resolve => {
+        element.style.transition = 'transform 0.5s ease';
+        
+        switch(direction) {
+            case 'right':
+                element.style.transform = `translateX(${distance}px)`;
+                break;
+            case 'down':
+                element.style.transform += ` translateY(${distance}px)`;
+                break;
+            // ... 他の方向
+        }
+        
+        setTimeout(resolve, 500);
+    });
+}</code></pre>
+            </div>
+        </section>
+
+        <section id="best-practices">
+            <h2>ベストプラクティス</h2>
+            
+            <div class="best-practice">
+                <h3>1. エラーハンドリングを忘れない</h3>
+                <pre><code>// ❌ 悪い例
+async function badExample() {
+    const data = await fetch('/api/data'); // エラーが発生したらクラッシュ
+}
+
+// ✅ 良い例
+async function goodExample() {
+    try {
+        const data = await fetch('/api/data');
+        return data;
+    } catch (error) {
+        console.error('エラー:', error);
+        return null; // デフォルト値を返す
+    }
+}</code></pre>
+            </div>
+
+            <div class="best-practice">
+                <h3>2. 不要な await を避ける</h3>
+                <pre><code>// ❌ 不要な await
+async function unnecessary() {
+    return await fetch('/api/data'); // awaitは不要
+}
+
+// ✅ シンプルに
+async function simple() {
+    return fetch('/api/data');
+}</code></pre>
+            </div>
+
+            <div class="best-practice">
+                <h3>3. 並列処理を活用する</h3>
+                <pre><code>// ❌ 逐次処理（遅い）
+const user = await getUser();
+const posts = await getPosts();
+const comments = await getComments();
+
+// ✅ 並列処理（速い）
+const [user, posts, comments] = await Promise.all([
+    getUser(),
+    getPosts(),
+    getComments()
+]);</code></pre>
+            </div>
+        </section>
+
+        <section class="summary">
+            <h2>まとめ</h2>
+            <div class="key-points">
+                <h3>async/awaitの重要ポイント</h3>
+                <ul>
+                    <li>✅ Promiseをより直感的に書ける</li>
+                    <li>✅ 同期的なコードのように読みやすい</li>
+                    <li>✅ try-catchでエラーハンドリングが簡単</li>
+                    <li>✅ デバッグがしやすい</li>
+                    <li>✅ Promiseと完全に互換性がある</li>
+                </ul>
+            </div>
+            
+            <div class="next-steps">
+                <h3>次のステップ</h3>
+                <p>非同期処理をマスターしたら、関数型プログラミングの世界へ：</p>
+                <a href="higher-order-functions.html" class="next-link">高階関数 - 関数を操る関数 →</a>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>async/await完全ガイド - モダンな非同期処理をマスターしよう！</p>
+    </footer>
+
+    <script src="async-script.js"></script>
+</body>
+</html>

@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JavaScriptコールバック関数完全ガイド</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <div style="text-align: right; padding: 10px;">
+            <a href="../index.html" style="color: white; text-decoration: none; font-size: 16px; background: rgba(255,255,255,0.2); padding: 8px 16px; border-radius: 8px; transition: background 0.3s;">← プロジェクト一覧</a>
+        </div>
+        <h1>JavaScriptコールバック関数<br>完全理解ガイド</h1>
+        <p class="subtitle">初心者でもわかる！実例で学ぶコールバック関数</p>
+    </header>
+
+    <nav>
+        <ul>
+            <li><a href="#what-is-callback">コールバック関数とは？</a></li>
+            <li><a href="#why-callback">なぜ必要？</a></li>
+            <li><a href="#basic-examples">基本的な例</a></li>
+            <li><a href="#practical-examples">実践的な例</a></li>
+            <li><a href="#common-mistakes">よくある間違い</a></li>
+            <li><a href="#interactive-demo">インタラクティブデモ</a></li>
+        </ul>
+    </nav>
+
+    <main>
+        <section id="what-is-callback">
+            <h2>コールバック関数とは？</h2>
+            <div class="explanation">
+                <p>コールバック関数とは、<strong>他の関数に引数として渡される関数</strong>のことです。</p>
+                <p>「後で呼び出して（コールバックして）もらう関数」という意味で、この名前がつけられています。</p>
+                
+                <div class="analogy">
+                    <h3>📞 日常生活での例え</h3>
+                    <p>レストランで注文をして、料理ができたら店員さんが呼んでくれる。これがコールバックの考え方です！</p>
+                    <ul>
+                        <li>注文 = 関数の実行</li>
+                        <li>料理ができたら呼ぶ = コールバック関数</li>
+                        <li>呼ばれて料理を受け取る = コールバック関数の実行</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section id="why-callback">
+            <h2>なぜコールバック関数が必要？</h2>
+            <div class="explanation">
+                <h3>1. 非同期処理の対応</h3>
+                <p>JavaScriptは時間のかかる処理を待たずに次の処理に進みます。処理が終わったタイミングで実行したい場合にコールバックを使います。</p>
+                
+                <h3>2. 柔軟な処理の実現</h3>
+                <p>同じ関数でも、渡すコールバック関数を変えることで異なる処理を実現できます。</p>
+                
+                <h3>3. イベント処理</h3>
+                <p>ボタンクリックなど、いつ起こるかわからないイベントに対応できます。</p>
+            </div>
+        </section>
+
+        <section id="basic-examples">
+            <h2>基本的な例</h2>
+            
+            <div class="example">
+                <h3>例1: シンプルなコールバック</h3>
+                <pre><code class="javascript">// コールバック関数を受け取る関数
+function greet(name, callback) {
+    console.log('こんにちは、' + name + 'さん！');
+    callback();
+}
+
+// コールバック関数
+function afterGreeting() {
+    console.log('挨拶が終わりました！');
+}
+
+// 実行
+greet('太郎', afterGreeting);</code></pre>
+                <button class="run-code" data-example="1">実行してみる</button>
+                <div class="output" id="output-1"></div>
+            </div>
+
+            <div class="example">
+                <h3>例2: 引数付きコールバック</h3>
+                <pre><code class="javascript">function calculate(num1, num2, callback) {
+    const result = num1 + num2;
+    callback(result);
+}
+
+calculate(5, 3, function(result) {
+    console.log('計算結果は: ' + result);
+});</code></pre>
+                <button class="run-code" data-example="2">実行してみる</button>
+                <div class="output" id="output-2"></div>
+            </div>
+
+            <div class="example">
+                <h3>例3: タイマーでのコールバック</h3>
+                <pre><code class="javascript">console.log('1. 処理開始');
+
+setTimeout(function() {
+    console.log('2. 3秒後に実行されました！');
+}, 3000);
+
+console.log('3. この行は先に実行されます');</code></pre>
+                <button class="run-code" data-example="3">実行してみる</button>
+                <div class="output" id="output-3"></div>
+            </div>
+        </section>
+
+        <section id="practical-examples">
+            <h2>実践的な例</h2>
+            
+            <div class="example">
+                <h3>例4: 配列のメソッドでのコールバック</h3>
+                <pre><code class="javascript">const numbers = [1, 2, 3, 4, 5];
+
+// map: 各要素を2倍にする
+const doubled = numbers.map(function(num) {
+    return num * 2;
+});
+console.log('2倍:', doubled);
+
+// filter: 偶数だけを抽出
+const evens = numbers.filter(function(num) {
+    return num % 2 === 0;
+});
+console.log('偶数:', evens);
+
+// forEach: 各要素を表示
+numbers.forEach(function(num, index) {
+    console.log(index + '番目: ' + num);
+});</code></pre>
+                <button class="run-code" data-example="4">実行してみる</button>
+                <div class="output" id="output-4"></div>
+            </div>
+
+            <div class="example">
+                <h3>例5: イベントリスナーでのコールバック</h3>
+                <div class="demo-area">
+                    <button id="demo-button">クリックしてください</button>
+                    <p id="click-count">クリック回数: 0</p>
+                </div>
+                <pre><code class="javascript">let clickCount = 0;
+
+document.getElementById('demo-button').addEventListener('click', function() {
+    clickCount++;
+    document.getElementById('click-count').textContent = 'クリック回数: ' + clickCount;
+});</code></pre>
+            </div>
+        </section>
+
+        <section id="common-mistakes">
+            <h2>よくある間違いと注意点</h2>
+            
+            <div class="mistake">
+                <h3>❌ 間違い: 関数を実行してしまう</h3>
+                <pre><code class="javascript">// 間違い - 関数を実行してしまっている
+button.addEventListener('click', myFunction());
+
+// 正解 - 関数を渡す（実行しない）
+button.addEventListener('click', myFunction);</code></pre>
+            </div>
+
+            <div class="mistake">
+                <h3>❌ 間違い: コールバック地獄</h3>
+                <pre><code class="javascript">// 避けるべきパターン
+getData(function(a) {
+    getMoreData(a, function(b) {
+        getMoreData(b, function(c) {
+            getMoreData(c, function(d) {
+                // ネストが深すぎて読みにくい！
+            });
+        });
+    });
+});</code></pre>
+                <p class="tip">💡 ヒント: Promise や async/await を使うと、より読みやすいコードが書けます！</p>
+            </div>
+        </section>
+
+        <section id="interactive-demo">
+            <h2>インタラクティブデモ</h2>
+            
+            <div class="interactive-demo">
+                <h3>自分でコールバック関数を試してみよう！</h3>
+                
+                <div class="demo-controls">
+                    <label>
+                        処理の種類:
+                        <select id="operation-type">
+                            <option value="math">計算</option>
+                            <option value="string">文字列処理</option>
+                            <option value="timer">タイマー</option>
+                        </select>
+                    </label>
+                    
+                    <label>
+                        入力値:
+                        <input type="text" id="demo-input" value="5">
+                    </label>
+                    
+                    <button id="run-demo">実行</button>
+                </div>
+                
+                <div class="demo-code">
+                    <pre><code id="demo-code-display">// ここにコードが表示されます</code></pre>
+                </div>
+                
+                <div class="demo-result">
+                    <h4>実行結果:</h4>
+                    <div id="demo-output"></div>
+                </div>
+            </div>
+        </section>
+
+        <section class="summary">
+            <h2>まとめ</h2>
+            <div class="key-points">
+                <h3>コールバック関数の重要ポイント</h3>
+                <ul>
+                    <li>✅ 関数を引数として渡す</li>
+                    <li>✅ 後で実行される</li>
+                    <li>✅ 非同期処理に便利</li>
+                    <li>✅ イベント処理に必須</li>
+                    <li>✅ 柔軟な処理が可能</li>
+                </ul>
+            </div>
+            
+            <div class="next-steps">
+                <h3>次のステップ</h3>
+                <p>コールバック関数を理解したら、次は以下を学習してみましょう：</p>
+                <div class="next-links">
+                    <a href="promise.html" class="study-link">
+                        <h4>Promise</h4>
+                        <p>より読みやすい非同期処理</p>
+                    </a>
+                    <a href="async-await.html" class="study-link">
+                        <h4>async/await</h4>
+                        <p>さらに直感的な非同期処理</p>
+                    </a>
+                    <a href="higher-order-functions.html" class="study-link">
+                        <h4>高階関数</h4>
+                        <p>関数を操る関数</p>
+                    </a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>JavaScriptコールバック関数完全ガイド - 楽しく学ぼう！</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Promise - より読みやすい非同期処理</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="promise-styles.css">
+</head>
+<body>
+    <header>
+        <div style="text-align: right; padding: 10px;">
+            <a href="index.html" style="color: white; text-decoration: none; font-size: 16px; background: rgba(255,255,255,0.2); padding: 8px 16px; border-radius: 8px; transition: background 0.3s;">← コールバック関数ガイド</a>
+        </div>
+        <h1>Promise（プロミス）<br>完全理解ガイド</h1>
+        <p class="subtitle">コールバック地獄を解決する、より読みやすい非同期処理</p>
+    </header>
+
+    <nav>
+        <ul>
+            <li><a href="#what-is-promise">Promiseとは？</a></li>
+            <li><a href="#promise-states">3つの状態</a></li>
+            <li><a href="#basic-usage">基本的な使い方</a></li>
+            <li><a href="#chaining">チェーン処理</a></li>
+            <li><a href="#error-handling">エラー処理</a></li>
+            <li><a href="#practical-examples">実践的な例</a></li>
+        </ul>
+    </nav>
+
+    <main>
+        <section id="what-is-promise">
+            <h2>Promiseとは？</h2>
+            <div class="explanation">
+                <p>Promiseは<strong>非同期処理の最終的な完了（または失敗）とその結果の値を表すオブジェクト</strong>です。</p>
+                
+                <div class="analogy">
+                    <h3>🎫 日常生活での例え</h3>
+                    <p>レストランで注文した時にもらう「番号札」のようなものです！</p>
+                    <ul>
+                        <li>番号札 = Promise オブジェクト</li>
+                        <li>料理の準備中 = pending（待機状態）</li>
+                        <li>料理完成 = fulfilled（成功状態）</li>
+                        <li>材料切れ = rejected（失敗状態）</li>
+                    </ul>
+                </div>
+
+                <h3>コールバックとの違い</h3>
+                <div class="comparison">
+                    <div class="callback-example">
+                        <h4>❌ コールバック地獄</h4>
+                        <pre><code>getData(function(a) {
+    getMoreData(a, function(b) {
+        getMoreData(b, function(c) {
+            // ネストが深くて読みにくい...
+        });
+    });
+});</code></pre>
+                    </div>
+                    <div class="promise-example">
+                        <h4>✅ Promiseチェーン</h4>
+                        <pre><code>getData()
+    .then(a => getMoreData(a))
+    .then(b => getMoreData(b))
+    .then(c => {
+        // フラットで読みやすい！
+    });</code></pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="promise-states">
+            <h2>Promiseの3つの状態</h2>
+            <div class="states-container">
+                <div class="state-card pending">
+                    <h3>⏳ Pending（待機）</h3>
+                    <p>初期状態。処理がまだ完了していない</p>
+                    <pre><code>const promise = new Promise((resolve, reject) => {
+    // まだ resolve も reject も呼ばれていない
+});</code></pre>
+                </div>
+                
+                <div class="state-card fulfilled">
+                    <h3>✅ Fulfilled（成功）</h3>
+                    <p>処理が正常に完了した状態</p>
+                    <pre><code>const promise = new Promise((resolve, reject) => {
+    resolve('成功！'); // この瞬間にfulfilled状態に
+});</code></pre>
+                </div>
+                
+                <div class="state-card rejected">
+                    <h3>❌ Rejected（失敗）</h3>
+                    <p>処理が失敗した状態</p>
+                    <pre><code>const promise = new Promise((resolve, reject) => {
+    reject('エラー発生'); // この瞬間にrejected状態に
+});</code></pre>
+                </div>
+            </div>
+            
+            <div class="state-flow">
+                <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8IS0tIFBlbmRpbmcgU3RhdGUgLS0+CiAgPGNpcmNsZSBjeD0iMTAwIiBjeT0iMTAwIiByPSI0MCIgZmlsbD0iI2ZiYmY0MCIgc3Ryb2tlPSIjMzMzIiBzdHJva2Utd2lkdGg9IjIiLz4KICA8dGV4dCB4PSIxMDAiIHk9IjEwNSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE0IiBmaWxsPSIjMzMzIj5QZW5kaW5nPC90ZXh0PgogIAogIDwhLS0gRnVsZmlsbGVkIFN0YXRlIC0tPgogIDxjaXJjbGUgY3g9IjMwMCIgY3k9IjUwIiByPSI0MCIgZmlsbD0iIzQ4YmI3OCIgc3Ryb2tlPSIjMzMzIiBzdHJva2Utd2lkdGg9IjIiLz4KICA8dGV4dCB4PSIzMDAiIHk9IjU1IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTQiIGZpbGw9IndoaXRlIj5GdWxmaWxsZWQ8L3RleHQ+CiAgCiAgPCEtLSBSZWplY3RlZCBTdGF0ZSAtLT4KICA8Y2lyY2xlIGN4PSIzMDAiIGN5PSIxNTAiIHI9IjQwIiBmaWxsPSIjZjU2NTY1IiBzdHJva2U9IiMzMzMiIHN0cm9rZS13aWR0aD0iMiIvPgogIDx0ZXh0IHg9IjMwMCIgeT0iMTU1IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTQiIGZpbGw9IndoaXRlIj5SZWplY3RlZDwvdGV4dD4KICAKICA8IS0tIEFycm93cyAtLT4KICA8cGF0aCBkPSJNMTQwLDgwIEwyNjAsNjAiIHN0cm9rZT0iIzQ4YmI3OCIgc3Ryb2tlLXdpZHRoPSIyIiBmaWxsPSJub25lIiBtYXJrZXItZW5kPSJ1cmwoI2Fycm93Z3JlZW4pIi8+CiAgPHBhdGggZD0iTTE0MCwxMjAgTDI2MCwxNDAiIHN0cm9rZT0iI2Y1NjU2NSIgc3Ryb2tlLXdpZHRoPSIyIiBmaWxsPSJub25lIiBtYXJrZXItZW5kPSJ1cmwoI2Fycm93cmVkKSIvPgogIAogIDwhLS0gQXJyb3cgbWFya2VycyAtLT4KICA8ZGVmcz4KICAgIDxtYXJrZXIgaWQ9ImFycm93Z3JlZW4iIG1hcmtlcldpZHRoPSIxMCIgbWFya2VySGVpZ2h0PSIxMCIgcmVmWD0iOSIgcmVmWT0iMyIgb3JpZW50PSJhdXRvIiBtYXJrZXJVbml0cz0ic3Ryb2tlV2lkdGgiPgogICAgICA8cGF0aCBkPSJNMCwwIEw5LDMgTDAsNiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjNDhiYjc4IiBzdHJva2Utd2lkdGg9IjIiLz4KICAgIDwvbWFya2VyPgogICAgPG1hcmtlciBpZD0iYXJyb3dyZWQiIG1hcmtlcldpZHRoPSIxMCIgbWFya2VySGVpZ2h0PSIxMCIgcmVmWD0iOSIgcmVmWT0iMyIgb3JpZW50PSJhdXRvIiBtYXJrZXJVbml0cz0ic3Ryb2tlV2lkdGgiPgogICAgICA8cGF0aCBkPSJNMCwwIEw5LDMgTDAsNiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZjU2NTY1IiBzdHJva2Utd2lkdGg9IjIiLz4KICAgIDwvbWFya2VyPgogIDwvZGVmcz4KICAKICA8dGV4dCB4PSIxODAiIHk9IjYwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTIiIGZpbGw9IiM0OGJiNzgiPnJlc29sdmUoKTwvdGV4dD4KICA8dGV4dCB4PSIxODAiIHk9IjE0NSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjEyIiBmaWxsPSIjZjU2NTY1Ij5yZWplY3QoKTwvdGV4dD4KPC9zdmc+" alt="Promise状態遷移図" />
+            </div>
+        </section>
+
+        <section id="basic-usage">
+            <h2>基本的な使い方</h2>
+            
+            <div class="example">
+                <h3>Promiseの作成</h3>
+                <pre><code>// Promiseを作成
+const myPromise = new Promise((resolve, reject) => {
+    // 非同期処理を実行
+    setTimeout(() => {
+        const success = true; // 仮の条件
+        
+        if (success) {
+            resolve('処理が成功しました！');
+        } else {
+            reject('エラーが発生しました');
+        }
+    }, 1000);
+});
+
+// Promiseを使用
+myPromise
+    .then(result => {
+        console.log('成功:', result);
+    })
+    .catch(error => {
+        console.log('失敗:', error);
+    });</code></pre>
+                <button class="run-code" onclick="runPromiseExample1()">実行してみる</button>
+                <div class="output" id="promise-output-1"></div>
+            </div>
+
+            <div class="example">
+                <h3>即座に解決/拒否するPromise</h3>
+                <pre><code>// 即座に成功するPromise
+Promise.resolve('即座に成功！')
+    .then(result => console.log(result));
+
+// 即座に失敗するPromise
+Promise.reject('即座に失敗！')
+    .catch(error => console.log(error));</code></pre>
+                <button class="run-code" onclick="runPromiseExample2()">実行してみる</button>
+                <div class="output" id="promise-output-2"></div>
+            </div>
+        </section>
+
+        <section id="chaining">
+            <h2>Promiseチェーン</h2>
+            
+            <div class="tip" style="background: #e6f3ff; border-left: 4px solid #3182ce; padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem;">
+                <h3>💡 重要：.then()の中でreturnを使う理由</h3>
+                <p>Promiseチェーンで次の処理に値を渡すには、<strong>必ずreturnが必要</strong>です！</p>
+                <a href="promise-return-demo.html" style="display: inline-block; background: #3182ce; color: white; padding: 0.5rem 1rem; border-radius: 5px; text-decoration: none; margin-top: 0.5rem;">詳しい解説を見る →</a>
+            </div>
+            
+            <div class="example">
+                <h3>連続した非同期処理</h3>
+                <pre><code>function step1() {
+    return new Promise(resolve => {
+        setTimeout(() => resolve('ステップ1完了'), 1000);
+    });
+}
+
+function step2(prevResult) {
+    return new Promise(resolve => {
+        setTimeout(() => resolve(prevResult + ' → ステップ2完了'), 1000);
+    });
+}
+
+function step3(prevResult) {
+    return new Promise(resolve => {
+        setTimeout(() => resolve(prevResult + ' → ステップ3完了'), 1000);
+    });
+}
+
+// チェーン処理
+step1()
+    .then(result => {
+        console.log(result);
+        return step2(result);
+    })
+    .then(result => {
+        console.log(result);
+        return step3(result);
+    })
+    .then(result => {
+        console.log('最終結果:', result);
+    });</code></pre>
+                <button class="run-code" onclick="runChainExample()">実行してみる</button>
+                <div class="output" id="chain-output"></div>
+            </div>
+        </section>
+
+        <section id="error-handling">
+            <h2>エラー処理</h2>
+            
+            <div class="example">
+                <h3>エラーの伝播とキャッチ</h3>
+                <pre><code>function riskyOperation(shouldFail) {
+    return new Promise((resolve, reject) => {
+        setTimeout(() => {
+            if (shouldFail) {
+                reject(new Error('処理に失敗しました'));
+            } else {
+                resolve('処理成功！');
+            }
+        }, 1000);
+    });
+}
+
+// エラーハンドリング
+riskyOperation(true)
+    .then(result => {
+        console.log('成功:', result);
+        return '次の処理へ';
+    })
+    .then(result => {
+        // このthenは実行されない
+        console.log(result);
+    })
+    .catch(error => {
+        console.error('エラーをキャッチ:', error.message);
+        return 'エラーから復帰';
+    })
+    .then(result => {
+        // catchの後のthenは実行される
+        console.log('処理継続:', result);
+    });</code></pre>
+                <button class="run-code" onclick="runErrorExample()">実行してみる</button>
+                <div class="output" id="error-output"></div>
+            </div>
+        </section>
+
+        <section id="practical-examples">
+            <h2>実践的な例</h2>
+            
+            <div class="example">
+                <h3>Promise.all - 複数の非同期処理を並列実行</h3>
+                <pre><code>const promise1 = new Promise(resolve => 
+    setTimeout(() => resolve('データ1'), 1000)
+);
+const promise2 = new Promise(resolve => 
+    setTimeout(() => resolve('データ2'), 2000)
+);
+const promise3 = new Promise(resolve => 
+    setTimeout(() => resolve('データ3'), 1500)
+);
+
+// すべてのPromiseが完了するまで待つ
+Promise.all([promise1, promise2, promise3])
+    .then(results => {
+        console.log('すべて完了:', results);
+        // ['データ1', 'データ2', 'データ3']
+    });</code></pre>
+                <button class="run-code" onclick="runPromiseAllExample()">実行してみる</button>
+                <div class="output" id="promise-all-output"></div>
+            </div>
+
+            <div class="example">
+                <h3>Promise.race - 最初に完了したPromiseの結果を取得</h3>
+                <pre><code>const slow = new Promise(resolve => 
+    setTimeout(() => resolve('遅い処理'), 3000)
+);
+const fast = new Promise(resolve => 
+    setTimeout(() => resolve('速い処理'), 1000)
+);
+
+// 最初に完了したPromiseの結果を取得
+Promise.race([slow, fast])
+    .then(result => {
+        console.log('最初に完了:', result);
+        // '速い処理'
+    });</code></pre>
+                <button class="run-code" onclick="runPromiseRaceExample()">実行してみる</button>
+                <div class="output" id="promise-race-output"></div>
+            </div>
+
+            <div class="example">
+                <h3>実用例: APIからデータを取得</h3>
+                <pre><code>function fetchUserData(userId) {
+    return fetch(`/api/users/${userId}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('ユーザーが見つかりません');
+            }
+            return response.json();
+        });
+}
+
+// 使用例
+fetchUserData(123)
+    .then(user => {
+        console.log('ユーザー情報:', user);
+        return fetch(`/api/users/${user.id}/posts`);
+    })
+    .then(response => response.json())
+    .then(posts => {
+        console.log('投稿一覧:', posts);
+    })
+    .catch(error => {
+        console.error('エラー:', error.message);
+    });</code></pre>
+            </div>
+        </section>
+
+        <section class="summary">
+            <h2>まとめ</h2>
+            <div class="key-points">
+                <h3>Promiseの重要ポイント</h3>
+                <ul>
+                    <li>✅ 非同期処理をより読みやすく書ける</li>
+                    <li>✅ エラーハンドリングが簡潔</li>
+                    <li>✅ チェーン処理で複雑な非同期処理も管理しやすい</li>
+                    <li>✅ Promise.all()で並列処理も簡単</li>
+                    <li>✅ コールバック地獄を回避できる</li>
+                </ul>
+            </div>
+            
+            <div class="next-steps">
+                <h3>次のステップ</h3>
+                <p>Promiseを理解したら、さらに進化した非同期処理を学びましょう：</p>
+                <a href="async-await.html" class="next-link">async/await - さらに直感的な非同期処理 →</a>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>Promise完全ガイド - より良い非同期処理を書こう！</p>
+    </footer>
+
+    <script src="promise-script.js"></script>
+</body>
+</html>

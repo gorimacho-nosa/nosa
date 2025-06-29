@@ -1,0 +1,128 @@
+.factory-example {
+    background: #f8f9fa;
+    padding: 2rem;
+    border-radius: 10px;
+    text-align: center;
+    margin: 2rem 0;
+}
+
+.factory {
+    background: white;
+    padding: 2rem;
+    border-radius: 8px;
+    border: 2px solid #667eea;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.factory h4 {
+    color: #667eea;
+    margin-bottom: 1rem;
+}
+
+.factory ul {
+    text-align: left;
+    list-style: none;
+    padding: 0;
+}
+
+.factory li {
+    padding: 0.5rem;
+    margin: 0.5rem 0;
+    background: #f0f4f8;
+    border-radius: 5px;
+}
+
+.hof-types {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    margin: 2rem 0;
+}
+
+.hof-type {
+    background: #f8f9fa;
+    padding: 1.5rem;
+    border-radius: 8px;
+    border-left: 4px solid #667eea;
+}
+
+.built-in-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin: 2rem 0;
+}
+
+.built-in-card {
+    background: white;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+}
+
+.built-in-card:hover {
+    border-color: #667eea;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+}
+
+.built-in-card h3 {
+    color: #667eea;
+    margin-top: 0;
+    font-family: 'Courier New', monospace;
+}
+
+.built-in-card p {
+    color: #64748b;
+    margin: 0.5rem 0;
+}
+
+.built-in-card pre {
+    margin-bottom: 0;
+    font-size: 0.85rem;
+}
+
+.demo-area {
+    background: #f8f9fa;
+    padding: 2rem;
+    border-radius: 8px;
+    margin: 1rem 0;
+}
+
+#search-input {
+    width: 100%;
+    padding: 0.75rem;
+    font-size: 1rem;
+    border: 2px solid #e2e8f0;
+    border-radius: 5px;
+    transition: border-color 0.3s ease;
+}
+
+#search-input:focus {
+    outline: none;
+    border-color: #667eea;
+}
+
+#search-output {
+    margin-top: 1rem;
+    padding: 1rem;
+    background: white;
+    border-radius: 5px;
+    min-height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #64748b;
+}
+
+@media (max-width: 768px) {
+    .hof-types {
+        grid-template-columns: 1fr;
+    }
+    
+    .built-in-grid {
+        grid-template-columns: 1fr;
+    }
+}

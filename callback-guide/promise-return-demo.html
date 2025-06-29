@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Promise .then()のreturnを理解する</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+        
+        .code-block {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 1.5rem;
+            position: relative;
+        }
+        
+        .code-block.wrong {
+            border: 2px solid #f56565;
+        }
+        
+        .code-block.correct {
+            border: 2px solid #48bb78;
+        }
+        
+        .label {
+            position: absolute;
+            top: -12px;
+            left: 20px;
+            background: white;
+            padding: 0 10px;
+            font-weight: bold;
+        }
+        
+        .wrong .label {
+            color: #f56565;
+        }
+        
+        .correct .label {
+            color: #48bb78;
+        }
+        
+        .flow-diagram {
+            background: #f0f4f8;
+            padding: 2rem;
+            border-radius: 10px;
+            margin: 2rem 0;
+            text-align: center;
+        }
+        
+        .promise-box {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            margin: 0.5rem;
+        }
+        
+        .arrow {
+            font-size: 2rem;
+            color: #667eea;
+            margin: 0 1rem;
+        }
+        
+        .demo-section {
+            background: #e6f3ff;
+            padding: 2rem;
+            border-radius: 10px;
+            margin: 2rem 0;
+        }
+        
+        .timeline {
+            position: relative;
+            padding-left: 30px;
+            margin: 1rem 0;
+        }
+        
+        .timeline-item {
+            position: relative;
+            padding: 0.5rem 0;
+            opacity: 0.5;
+            transition: opacity 0.3s ease;
+        }
+        
+        .timeline-item.active {
+            opacity: 1;
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .timeline-item::before {
+            content: '○';
+            position: absolute;
+            left: -25px;
+            color: #ccc;
+        }
+        
+        .timeline-item.active::before {
+            content: '●';
+            color: #667eea;
+        }
+        
+        @media (max-width: 768px) {
+            .comparison-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div style="text-align: right; padding: 10px;">
+            <a href="promise.html" style="color: white; text-decoration: none; font-size: 16px; background: rgba(255,255,255,0.2); padding: 8px 16px; border-radius: 8px; transition: background 0.3s;">← Promiseガイドに戻る</a>
+        </div>
+        <h1>Promise .then()のreturn<br>完全理解</h1>
+        <p class="subtitle">なぜreturnが必要？ただ実行するだけではダメな理由</p>
+    </header>
+
+    <main>
+        <section>
+            <h2>質問：returnの効果は？</h2>
+            <div class="explanation">
+                <p><strong>「.then()の中でreturnを使う理由は何？ただstep2(result)を実行するだけではダメ？」</strong></p>
+                <p>これは非常に重要な質問です！実は、<code>return</code>があるかないかで、Promiseチェーンの動作が全く変わります。</p>
+            </div>
+        </section>
+
+        <section>
+            <h2>returnの有無による違い</h2>
+            
+            <div class="comparison-grid">
+                <div class="code-block wrong">
+                    <span class="label">❌ returnなし（間違い）</span>
+                    <pre><code>step1()
+    .then(result => {
+        console.log(result);
+        step2(result); // returnなし！
+    })
+    .then(result => {
+        // resultはundefined！
+        console.log(result);
+    });</code></pre>
+                </div>
+                
+                <div class="code-block correct">
+                    <span class="label">✅ returnあり（正解）</span>
+                    <pre><code>step1()
+    .then(result => {
+        console.log(result);
+        return step2(result); // return必須！
+    })
+    .then(result => {
+        // step2の結果が入る！
+        console.log(result);
+    });</code></pre>
+                </div>
+            </div>
+            
+            <div class="flow-diagram">
+                <h3>Promiseチェーンの流れ</h3>
+                <div>
+                    <span class="promise-box">Promise 1</span>
+                    <span class="arrow">→</span>
+                    <span class="promise-box">.then()</span>
+                    <span class="arrow">→</span>
+                    <span class="promise-box">Promise 2</span>
+                    <span class="arrow">→</span>
+                    <span class="promise-box">.then()</span>
+                </div>
+                <p style="margin-top: 1rem; color: #667eea;">returnがないと、チェーンが切れてしまいます！</p>
+            </div>
+        </section>
+
+        <section>
+            <h2>インタラクティブデモ</h2>
+            
+            <div class="demo-section">
+                <h3>1. returnなしの場合</h3>
+                <pre><code>function fetchUser() {
+    return Promise.resolve({ id: 1, name: '太郎' });
+}
+
+function fetchPosts(user) {
+    return Promise.resolve([
+        { userId: user.id, title: '記事1' },
+        { userId: user.id, title: '記事2' }
+    ]);
+}
+
+// ❌ returnなし
+fetchUser()
+    .then(user => {
+        console.log('ユーザー:', user);
+        fetchPosts(user); // returnを忘れた！
+    })
+    .then(posts => {
+        console.log('投稿:', posts); // undefined が表示される
+    });</code></pre>
+                <button class="run-code" onclick="runNoReturnExample()">実行してみる</button>
+                <div class="output" id="no-return-output"></div>
+                
+                <div class="timeline" id="no-return-timeline">
+                    <div class="timeline-item">1. fetchUser()を実行</div>
+                    <div class="timeline-item">2. ユーザー情報を取得</div>
+                    <div class="timeline-item">3. fetchPosts()を実行（でも結果を返さない）</div>
+                    <div class="timeline-item">4. 次の.then()にundefinedが渡される</div>
+                </div>
+            </div>
+            
+            <div class="demo-section">
+                <h3>2. returnありの場合</h3>
+                <pre><code>// ✅ returnあり
+fetchUser()
+    .then(user => {
+        console.log('ユーザー:', user);
+        return fetchPosts(user); // returnで次のPromiseに繋げる！
+    })
+    .then(posts => {
+        console.log('投稿:', posts); // 正しく投稿データが表示される
+    });</code></pre>
+                <button class="run-code" onclick="runWithReturnExample()">実行してみる</button>
+                <div class="output" id="with-return-output"></div>
+                
+                <div class="timeline" id="with-return-timeline">
+                    <div class="timeline-item">1. fetchUser()を実行</div>
+                    <div class="timeline-item">2. ユーザー情報を取得</div>
+                    <div class="timeline-item">3. fetchPosts()の結果を返す</div>
+                    <div class="timeline-item">4. 次の.then()に投稿データが渡される</div>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <h2>returnで返せるもの</h2>
+            
+            <div class="example">
+                <h3>様々な値を返す例</h3>
+                <pre><code>Promise.resolve('開始')
+    .then(value => {
+        console.log(value); // '開始'
+        return 42; // 1. 普通の値
+    })
+    .then(value => {
+        console.log(value); // 42
+        return Promise.resolve('Promise!'); // 2. Promise
+    })
+    .then(value => {
+        console.log(value); // 'Promise!'
+        return { data: '結果' }; // 3. オブジェクト
+    })
+    .then(value => {
+        console.log(value); // { data: '結果' }
+        // 4. 何も返さない（undefined）
+    })
+    .then(value => {
+        console.log(value); // undefined
+    });</code></pre>
+                <button class="run-code" onclick="runReturnTypesExample()">実行してみる</button>
+                <div class="output" id="return-types-output"></div>
+            </div>
+        </section>
+
+        <section>
+            <h2>よくある間違いパターン</h2>
+            
+            <div class="example">
+                <h3>パターン1: 非同期処理の結果を返し忘れる</h3>
+                <pre><code>// ❌ 間違い
+getUserData()
+    .then(user => {
+        // fetchを実行するが結果を返さない
+        fetch(`/api/posts/${user.id}`);
+    })
+    .then(response => {
+        // responseはundefined！
+        return response.json(); // エラーになる
+    });
+
+// ✅ 正解
+getUserData()
+    .then(user => {
+        return fetch(`/api/posts/${user.id}`);
+    })
+    .then(response => {
+        return response.json();
+    });</code></pre>
+            </div>
+            
+            <div class="example">
+                <h3>パターン2: 並列処理でreturnを忘れる</h3>
+                <pre><code>// ❌ 間違い
+getUser()
+    .then(user => {
+        // Promise.allの結果を返し忘れる
+        Promise.all([
+            fetchPosts(user.id),
+            fetchComments(user.id)
+        ]);
+    })
+    .then(([posts, comments]) => {
+        // undefined！
+    });
+
+// ✅ 正解
+getUser()
+    .then(user => {
+        return Promise.all([
+            fetchPosts(user.id),
+            fetchComments(user.id)
+        ]);
+    })
+    .then(([posts, comments]) => {
+        // 正しく配列が受け取れる
+    });</code></pre>
+            </div>
+        </section>
+
+        <section>
+            <h2>実践的な比較デモ</h2>
+            
+            <div class="demo-section">
+                <h3>データ処理パイプライン</h3>
+                <p>同じデータ処理を、returnあり/なしで比較してみましょう</p>
+                
+                <button class="run-code" onclick="runPipelineComparison()">両方を実行して比較</button>
+                <div class="output" id="pipeline-output"></div>
+            </div>
+        </section>
+
+        <section class="summary">
+            <h2>まとめ</h2>
+            <div class="key-points">
+                <h3>returnが必要な理由</h3>
+                <ul>
+                    <li>✅ <strong>Promiseチェーンを繋げる</strong>：returnがないとチェーンが切れる</li>
+                    <li>✅ <strong>次の.then()に値を渡す</strong>：returnした値が次の.then()の引数になる</li>
+                    <li>✅ <strong>非同期処理を待つ</strong>：PromiseをreturnすることでPromiseの完了を待てる</li>
+                    <li>✅ <strong>エラーの伝播</strong>：エラーも適切に次の処理に伝わる</li>
+                </ul>
+                
+                <div class="tip" style="background: #e6f3ff; padding: 1.5rem; border-radius: 8px; margin-top: 2rem;">
+                    <h4>💡 覚え方のコツ</h4>
+                    <p>「.then()の中で次の処理に渡したいものは必ずreturnする」</p>
+                    <p>特に、Promise（非同期処理）を実行した場合は、その結果を次に渡すために必ずreturnが必要です！</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>Promise .then()のreturn完全理解 - もうreturnを忘れない！</p>
+    </footer>
+
+    <script>
+        function fetchUser() {
+            return Promise.resolve({ id: 1, name: '太郎' });
+        }
+
+        function fetchPosts(user) {
+            return new Promise(resolve => {
+                setTimeout(() => {
+                    resolve([
+                        { userId: user.id, title: '記事1' },
+                        { userId: user.id, title: '記事2' }
+                    ]);
+                }, 500);
+            });
+        }
+
+        function updateTimeline(timelineId, step) {
+            const items = document.querySelectorAll(`#${timelineId} .timeline-item`);
+            items.forEach((item, index) => {
+                if (index < step) {
+                    item.classList.add('active');
+                } else {
+                    item.classList.remove('active');
+                }
+            });
+        }
+
+        async function runNoReturnExample() {
+            const output = document.getElementById('no-return-output');
+            output.classList.add('show');
+            output.textContent = '';
+            
+            updateTimeline('no-return-timeline', 1);
+            await delay(500);
+            
+            fetchUser()
+                .then(user => {
+                    updateTimeline('no-return-timeline', 2);
+                    output.textContent += 'ユーザー: ' + JSON.stringify(user) + '\n';
+                    
+                    updateTimeline('no-return-timeline', 3);
+                    fetchPosts(user); // returnなし！
+                })
+                .then(posts => {
+                    setTimeout(() => {
+                        updateTimeline('no-return-timeline', 4);
+                        output.textContent += '投稿: ' + posts + ' ← undefinedになってしまう！\n';
+                    }, 600);
+                });
+        }
+
+        async function runWithReturnExample() {
+            const output = document.getElementById('with-return-output');
+            output.classList.add('show');
+            output.textContent = '';
+            
+            updateTimeline('with-return-timeline', 1);
+            await delay(500);
+            
+            fetchUser()
+                .then(user => {
+                    updateTimeline('with-return-timeline', 2);
+                    output.textContent += 'ユーザー: ' + JSON.stringify(user) + '\n';
+                    
+                    updateTimeline('with-return-timeline', 3);
+                    return fetchPosts(user); // returnあり！
+                })
+                .then(posts => {
+                    updateTimeline('with-return-timeline', 4);
+                    output.textContent += '投稿: ' + JSON.stringify(posts) + ' ← 正しくデータが取得できた！\n';
+                });
+        }
+
+        function runReturnTypesExample() {
+            const output = document.getElementById('return-types-output');
+            output.classList.add('show');
+            output.textContent = '';
+            
+            Promise.resolve('開始')
+                .then(value => {
+                    output.textContent += `受け取った値: "${value}"\n`;
+                    output.textContent += '→ 数値42を返す\n\n';
+                    return 42;
+                })
+                .then(value => {
+                    output.textContent += `受け取った値: ${value}\n`;
+                    output.textContent += '→ Promiseを返す\n\n';
+                    return Promise.resolve('Promise!');
+                })
+                .then(value => {
+                    output.textContent += `受け取った値: "${value}"\n`;
+                    output.textContent += '→ オブジェクトを返す\n\n';
+                    return { data: '結果' };
+                })
+                .then(value => {
+                    output.textContent += `受け取った値: ${JSON.stringify(value)}\n`;
+                    output.textContent += '→ 何も返さない\n\n';
+                })
+                .then(value => {
+                    output.textContent += `受け取った値: ${value}`;
+                });
+        }
+
+        async function runPipelineComparison() {
+            const output = document.getElementById('pipeline-output');
+            output.classList.add('show');
+            output.textContent = '=== returnなしの場合 ===\n';
+            
+            // returnなし
+            Promise.resolve([1, 2, 3, 4, 5])
+                .then(numbers => {
+                    output.textContent += '元の配列: ' + JSON.stringify(numbers) + '\n';
+                    numbers.map(n => n * 2); // returnなし！
+                })
+                .then(doubled => {
+                    output.textContent += '2倍にした結果: ' + doubled + ' ← undefined!\n';
+                    // undefinedなのでfilterできない
+                })
+                .then(() => {
+                    output.textContent += '\n=== returnありの場合 ===\n';
+                    
+                    // returnあり
+                    return Promise.resolve([1, 2, 3, 4, 5]);
+                })
+                .then(numbers => {
+                    output.textContent += '元の配列: ' + JSON.stringify(numbers) + '\n';
+                    return numbers.map(n => n * 2); // return!
+                })
+                .then(doubled => {
+                    output.textContent += '2倍にした結果: ' + JSON.stringify(doubled) + '\n';
+                    return doubled.filter(n => n > 5); // return!
+                })
+                .then(filtered => {
+                    output.textContent += '5より大きい数: ' + JSON.stringify(filtered) + '\n';
+                    return filtered.reduce((sum, n) => sum + n, 0); // return!
+                })
+                .then(sum => {
+                    output.textContent += '合計: ' + sum + ' ← 正しく計算できた！';
+                });
+        }
+
+        function delay(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+    </script>
+</body>
+</html>
