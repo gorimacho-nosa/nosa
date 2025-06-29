@@ -17,11 +17,19 @@ document.addEventListener('DOMContentLoaded', function() {
 
     navLinks.forEach(link => {
         link.addEventListener('click', function(e) {
+            const href = this.getAttribute('href');
+            
+            // 外部リンクや相対パスの場合は通常の動作をさせる
+            if (href.startsWith('../') || href.startsWith('http') || !href.startsWith('#')) {
+                navMenu.classList.remove('active');
+                return;
+            }
+            
             e.preventDefault();
             
             navMenu.classList.remove('active');
             
-            const targetId = this.getAttribute('href');
+            const targetId = href;
             const targetSection = document.querySelector(targetId);
             
             if (targetSection) {
