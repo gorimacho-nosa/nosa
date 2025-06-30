@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>アロー関数のreturn省略記法</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .syntax-comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+        
+        .syntax-block {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 10px;
+            border: 2px solid #48bb78;
+        }
+        
+        .equivalent {
+            text-align: center;
+            font-size: 2rem;
+            color: #48bb78;
+            margin: 1rem 0;
+        }
+        
+        .rule-box {
+            background: #e6f3ff;
+            border-left: 4px solid #3182ce;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 8px;
+        }
+        
+        @media (max-width: 768px) {
+            .syntax-comparison {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div style="text-align: right; padding: 10px;">
+            <a href="promise.html" style="color: white; text-decoration: none; font-size: 16px; background: rgba(255,255,255,0.2); padding: 8px 16px; border-radius: 8px; transition: background 0.3s;">← Promiseガイドに戻る</a>
+        </div>
+        <h1>アロー関数のreturn<br>省略記法</h1>
+        <p class="subtitle">いつreturnを省略できる？</p>
+    </header>
+
+    <main>
+        <section>
+            <h2>アロー関数の2つの書き方</h2>
+            
+            <div class="rule-box">
+                <h3>📝 基本ルール</h3>
+                <p>アロー関数では、<strong>波括弧 {} を使わない場合、自動的にreturnされます！</strong></p>
+            </div>
+            
+            <div class="syntax-comparison">
+                <div class="syntax-block">
+                    <h3>省略記法（波括弧なし）</h3>
+                    <pre><code>// 自動的にreturnされる
+response => response.json()
+
+// これは以下と同じ意味：
+response => {
+    return response.json();
+}</code></pre>
+                </div>
+                
+                <div class="syntax-block">
+                    <h3>通常記法（波括弧あり）</h3>
+                    <pre><code>// 明示的なreturnが必要
+response => {
+    return response.json();
+}
+
+// returnがないとundefinedに！
+response => {
+    response.json(); // ❌
+}</code></pre>
+                </div>
+            </div>
+            
+            <div class="equivalent">↑ 左右は同じ動作！</div>
+        </section>
+
+        <section>
+            <h2>Promiseチェーンでの使用例</h2>
+            
+            <div class="example">
+                <h3>すべて同じ意味の書き方</h3>
+                <pre><code>// 1. 省略記法（最も簡潔）
+fetch('/api/user')
+    .then(response => response.json())
+    .then(data => console.log(data));
+
+// 2. 波括弧ありでreturn
+fetch('/api/user')
+    .then(response => {
+        return response.json();
+    })
+    .then(data => {
+        return console.log(data);
+    });
+
+// 3. 通常の関数
+fetch('/api/user')
+    .then(function(response) {
+        return response.json();
+    })
+    .then(function(data) {
+        return console.log(data);
+    });</code></pre>
+                <button class="run-code" onclick="runComparisonDemo()">動作を確認</button>
+                <div class="output" id="comparison-output"></div>
+            </div>
+        </section>
+
+        <section>
+            <h2>いつ省略記法が使える？</h2>
+            
+            <div class="example">
+                <h3>✅ 省略記法が使える場合</h3>
+                <pre><code>// 1行の式
+const double = x => x * 2;
+
+// メソッド呼び出し
+const getLength = str => str.length;
+
+// Promiseチェーン
+promise.then(value => processValue(value));
+
+// 配列メソッド
+[1, 2, 3].map(n => n * 2);
+[1, 2, 3].filter(n => n > 1);</code></pre>
+            </div>
+            
+            <div class="example">
+                <h3>❌ 省略記法が使えない場合</h3>
+                <pre><code>// 複数の処理がある
+const processData = data => {
+    console.log('処理中:', data);
+    return data * 2; // 明示的なreturnが必要
+};
+
+// 条件分岐がある
+const checkValue = value => {
+    if (value > 0) {
+        return 'positive';
+    } else {
+        return 'negative';
+    }
+};
+
+// 一時変数を使う
+const calculate = (a, b) => {
+    const sum = a + b;
+    return sum * 2;
+};</code></pre>
+            </div>
+        </section>
+
+        <section>
+            <h2>よくある間違い</h2>
+            
+            <div class="example">
+                <h3>オブジェクトを返す時の注意</h3>
+                <pre><code>// ❌ エラー！ {} がコードブロックと解釈される
+const createUser = name => { name: name };
+
+// ✅ 正解1: 括弧で囲む
+const createUser = name => ({ name: name });
+
+// ✅ 正解2: returnを使う
+const createUser = name => {
+    return { name: name };
+};</code></pre>
+                <button class="run-code" onclick="runObjectReturnDemo()">動作を確認</button>
+                <div class="output" id="object-output"></div>
+            </div>
+        </section>
+
+        <section>
+            <h2>実践的な例</h2>
+            
+            <div class="example">
+                <h3>APIレスポンスの処理</h3>
+                <pre><code>// すべて省略記法で書いた場合
+fetch('/api/users')
+    .then(response => response.json())
+    .then(users => users.filter(u => u.active))
+    .then(activeUsers => activeUsers.map(u => u.name))
+    .then(names => names.sort())
+    .then(sortedNames => console.log(sortedNames));
+
+// 同じ処理を波括弧ありで書いた場合
+fetch('/api/users')
+    .then(response => {
+        return response.json();
+    })
+    .then(users => {
+        return users.filter(u => {
+            return u.active;
+        });
+    })
+    .then(activeUsers => {
+        return activeUsers.map(u => {
+            return u.name;
+        });
+    })
+    .then(names => {
+        return names.sort();
+    })
+    .then(sortedNames => {
+        return console.log(sortedNames);
+    });</code></pre>
+            </div>
+        </section>
+
+        <section class="summary">
+            <h2>まとめ</h2>
+            <div class="key-points">
+                <h3>覚えておくべきポイント</h3>
+                <ul>
+                    <li>✅ <code>response => response.json()</code> は自動的にreturnされる</li>
+                    <li>✅ 波括弧 {} がない = 暗黙のreturn</li>
+                    <li>✅ 波括弧 {} がある = 明示的なreturnが必要</li>
+                    <li>✅ 1行の式なら省略記法が簡潔でおすすめ</li>
+                    <li>✅ 複数行の処理なら波括弧を使う</li>
+                </ul>
+                
+                <div class="tip" style="background: #f0f9ff; padding: 1.5rem; border-radius: 8px; margin-top: 2rem;">
+                    <h4>💡 つまり</h4>
+                    <p><code>.then(response => response.json())</code> は正しく、returnは自動的に行われています！</p>
+                    <p><code>.then(response => return response.json())</code> は構文エラーです。</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>アロー関数のreturn省略記法 - もう迷わない！</p>
+    </footer>
+
+    <script>
+        function runComparisonDemo() {
+            const output = document.getElementById('comparison-output');
+            output.classList.add('show');
+            output.textContent = '3つの書き方をすべて実行します...\n\n';
+            
+            // 模擬的なレスポンスオブジェクト
+            const mockResponse = {
+                json: () => Promise.resolve({ user: '太郎', age: 25 })
+            };
+            
+            // 1. 省略記法
+            output.textContent += '1. 省略記法:\n';
+            Promise.resolve(mockResponse)
+                .then(response => response.json())
+                .then(data => {
+                    output.textContent += '結果: ' + JSON.stringify(data) + '\n\n';
+                    
+                    // 2. 波括弧ありでreturn
+                    output.textContent += '2. 波括弧ありでreturn:\n';
+                    return Promise.resolve(mockResponse);
+                })
+                .then(response => {
+                    return response.json();
+                })
+                .then(data => {
+                    output.textContent += '結果: ' + JSON.stringify(data) + '\n\n';
+                    
+                    // 3. 通常の関数
+                    output.textContent += '3. 通常の関数:\n';
+                    return Promise.resolve(mockResponse);
+                })
+                .then(function(response) {
+                    return response.json();
+                })
+                .then(function(data) {
+                    output.textContent += '結果: ' + JSON.stringify(data) + '\n\n';
+                    output.textContent += '→ すべて同じ結果になりました！';
+                });
+        }
+        
+        function runObjectReturnDemo() {
+            const output = document.getElementById('object-output');
+            output.classList.add('show');
+            output.textContent = '';
+            
+            try {
+                // これはエラーにならないが、期待した動作をしない
+                const wrongCreate = name => { name: name };
+                output.textContent += '❌ 間違い: ' + wrongCreate('太郎') + '\n';
+                output.textContent += '（undefinedが返される）\n\n';
+            } catch (e) {
+                output.textContent += '❌ エラー: ' + e.message + '\n\n';
+            }
+            
+            // 正しい方法1
+            const createUser1 = name => ({ name: name });
+            output.textContent += '✅ 正解1（括弧で囲む）: ' + JSON.stringify(createUser1('太郎')) + '\n\n';
+            
+            // 正しい方法2
+            const createUser2 = name => {
+                return { name: name };
+            };
+            output.textContent += '✅ 正解2（returnを使う）: ' + JSON.stringify(createUser2('太郎'));
+        }
+    </script>
+</body>
+</html>

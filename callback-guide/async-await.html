@@ -72,6 +72,7 @@
         .then(response => response.json())
         .then(posts => {
             console.log(posts);
+            return posts; // 結果を返す
         })
         .catch(error => {
             console.error(error);
@@ -265,6 +266,10 @@ async function parallelFetch() {
             
             <div class="example">
                 <h3>実用例1: APIチェーン</h3>
+                <div class="tip" style="background: #e6f3ff; border-left: 4px solid #3182ce; padding: 1rem; margin: 1rem 0; border-radius: 5px;">
+                    <strong>💡 ヒント:</strong> <code>...user</code> はスプレッド構文です。
+                    <a href="spread-syntax.html" style="color: #3182ce;">詳しい解説はこちら →</a>
+                </div>
                 <pre><code>// ユーザー情報と投稿を取得する実践的な例
 async function getUserWithPosts(userId) {
     try {
@@ -279,9 +284,9 @@ async function getUserWithPosts(userId) {
         
         // データを整形
         return {
-            ...user,
-            profile,
-            posts,
+            ...user,     // userのすべてのプロパティを展開
+            profile,     // profile: profile の省略記法
+            posts,       // posts: posts の省略記法
             postCount: posts.length
         };
         
@@ -460,7 +465,12 @@ const [user, posts, comments] = await Promise.all([
             <div class="next-steps">
                 <h3>次のステップ</h3>
                 <p>非同期処理をマスターしたら、関数型プログラミングの世界へ：</p>
-                <a href="higher-order-functions.html" class="next-link">高階関数 - 関数を操る関数 →</a>
+                <div class="next-links" style="margin-top: 1.5rem;">
+                    <a href="higher-order-functions.html" class="study-link" style="display: inline-block; background: white; border: 2px solid #667eea; border-radius: 10px; padding: 1.5rem 2rem; text-decoration: none; color: inherit; transition: all 0.3s ease;">
+                        <h4 style="color: #667eea; margin: 0 0 0.5rem 0;">高階関数</h4>
+                        <p style="color: #64748b; margin: 0; font-size: 0.9rem;">関数を操る関数 - 関数型プログラミングの基礎</p>
+                    </a>
+                </div>
             </div>
         </section>
     </main>
