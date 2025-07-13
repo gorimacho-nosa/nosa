@@ -103,26 +103,7 @@ document.addEventListener('DOMContentLoaded', function() {
             message: this.querySelector('textarea').value
         };
         
-        // console.log('送信データ:', formData);
-        function testWriteDiscord() {
-           writeDiscord(formData)
-        }
-
-        function writeDiscord(sentence) {
-          const WEBHOOK_URL = "https://discord.com/api/webhooks/1391071592632815616/ZbaAZbtWp9coXeIz6DL9bVtEC4vilyeXi-n2oOhgM9NcPkpRNd3QOFbpXw13TeaJ_a0q";//ここにwebhookURLを✝貼り付けて✝
-           let payload =
-          {
-            "content": sentence
-          };
-
-          let options =
-          {
-            "method": "post",
-            "payload": payload
-          };
-
-          UrlFetchApp.fetch(WEBHOOK_URL, options);
-          }
+        console.log('送信データ:', formData);
         
         alert('お問い合わせありがとうございます。メッセージを受け付けました。');
         
